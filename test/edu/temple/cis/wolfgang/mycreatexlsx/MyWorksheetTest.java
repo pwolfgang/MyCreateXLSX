@@ -5,15 +5,13 @@
 
 package edu.temple.cis.wolfgang.mycreatexlsx;
 
-import java.util.TimeZone;
-import java.util.GregorianCalendar;
-import java.util.Date;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static edu.temple.cis.wolfgang.mycreatexlsx.MyWorksheet.computeExcelDate;
 
 /**
  *
@@ -46,34 +44,23 @@ public class MyWorksheetTest {
     @Test
     public void testToBase26() {
         System.out.println("toBase26");
-        assertEquals("A", MyWorksheet.toBase26(0, ""));
-        assertEquals("Z", MyWorksheet.toBase26(25, ""));
-        assertEquals("AA", MyWorksheet.toBase26(26, ""));
-        assertEquals("AB", MyWorksheet.toBase26(27, ""));
-        assertEquals("BA", MyWorksheet.toBase26(52, ""));
-        assertEquals("ZZ", MyWorksheet.toBase26(701, ""));
-        assertEquals("AAA", MyWorksheet.toBase26(702, ""));
-        assertEquals("AAB", MyWorksheet.toBase26(703, ""));
+        assertEquals("A", MyWorksheet.toBase26(0));
+        assertEquals("Z", MyWorksheet.toBase26(25));
+        assertEquals("AA", MyWorksheet.toBase26(26));
+        assertEquals("AB", MyWorksheet.toBase26(27));
+        assertEquals("BA", MyWorksheet.toBase26(52));
+        assertEquals("ZZ", MyWorksheet.toBase26(701));
+        assertEquals("AAA", MyWorksheet.toBase26(702));
+        assertEquals("AAB", MyWorksheet.toBase26(703));
     }
 
 
-    @Test public void testExcelDate1() {
-        GregorianCalendar c = new GregorianCalendar();
-        c.setTimeZone(TimeZone.getTimeZone("GMT"));
-        c.set(1979, 3, 2);
-        Date d = c.getTime();
-        assertEquals("1979-04-02", String.format("%tF", d));
-        assertEquals("1979-04-02", 28947, MyWorksheet.computeExcelDate(d));
-    }
-
-
-    @Test public void testExcelDate2() {
-        GregorianCalendar c = new GregorianCalendar();
-        c.setTimeZone(TimeZone.getTimeZone("GMT"));
-        c.set(1979, 3, 3);
-        Date d = c.getTime();
-        assertEquals("1979-04-03", String.format("%tF", d));
-        assertEquals("1979-04-03", 28948, MyWorksheet.computeExcelDate(d));
+    
+    @Test public void testExcelDate3() {
+        assertEquals(1, computeExcelDate("1900-01-01"));
+        assertEquals(58, computeExcelDate("1900-02-27"));
+        assertEquals(59, computeExcelDate("1900-02-28"));
+        assertEquals(61, computeExcelDate("1900-03-01"));
     }
 
 }
