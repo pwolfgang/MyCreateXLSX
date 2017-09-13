@@ -5,6 +5,7 @@
 
 package edu.temple.cis.wolfgang.mycreatexlsx;
 
+import java.io.Closeable;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -19,9 +20,9 @@ import org.apache.log4j.Logger;
  * single worksheet.
  * @author Paul Wolfgang
  */
-public class MyWorkbook {
+public class MyWorkbook implements Closeable {
 
-    private static final Logger logger = Logger.getLogger(MyWorkbook.class);
+    private static final Logger LOGGER = Logger.getLogger(MyWorkbook.class);
 
     /** The zip output stream to hold the Excel workbook */
     private ZipOutputStream zos = null;
@@ -38,15 +39,17 @@ public class MyWorkbook {
 
     /**
      * Create a new MyWorkbook with the given file name
+     * @param fileName The name of the file to contain the Excel workbook
+     * @throws java.io.FileNotFoundException
      */
     public MyWorkbook(String fileName) throws FileNotFoundException {
             this(new FileOutputStream(fileName));
-            logger.debug("New workbook " + fileName);
+            LOGGER.debug("New workbook " + fileName);
     }
 
     /**
      * Create a new MyWorkbook with the given OutputStream
-     * @param os
+     * @param os The OutputStream where the workbook is written.
      */
     public MyWorkbook(OutputStream os) {
         try {
@@ -59,12 +62,13 @@ public class MyWorkbook {
             addPartFromTemplate("xl/styles.xml");
             addPartFromTemplate("xl/_rels/workbook.xml.rels");
             addPartFromTemplate("xl/theme/theme1.xml");
-            logger.debug("initialized new workbook");
+            LOGGER.debug("initialized new workbook");
         } catch (IOException ex) {
-            logger.error("IOException", ex);
+            LOGGER.error("IOException", ex);
         }
     }
 
+    @Override
     public void close() {
         try {
             if (zipEntry != null) {
@@ -75,7 +79,7 @@ public class MyWorkbook {
                 zos.close();
             }
         } catch (IOException ex) {
-            logger.error("Error closing stream", ex);
+            LOGGER.error("Error closing stream", ex);
         }
     }
 
@@ -88,7 +92,7 @@ public class MyWorkbook {
             zos.closeEntry();
             zipEntry = null;
         } else {
-            logger.error("Could not find " + partName);
+            LOGGER.error("Could not find " + partName);
         }
     }
 
@@ -111,7 +115,7 @@ public class MyWorkbook {
             zos.putNextEntry(zipEntry);
             return new MyWorksheet(zos);
         } catch (IOException ex) {
-            logger.error("Unable to add worksheet", ex);
+            LOGGER.error("Unable to add worksheet", ex);
             return null;
         }
     }
