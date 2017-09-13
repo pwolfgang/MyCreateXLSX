@@ -5,6 +5,7 @@
 
 package edu.temple.cis.wolfgang.mycreatexlsx;
 
+import java.io.Closeable;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -20,22 +21,22 @@ import org.apache.log4j.Logger;
  *
  * @author Paul Wolfgang
  */
-public class MyWorksheet {
+public class MyWorksheet implements Closeable {
 
-    private static final Logger logger = Logger.getLogger(MyWorkbook.class);
+    private static final Logger LOGGER = Logger.getLogger(MyWorkbook.class);
 
 
-    private static final long baseTime;
-    private static final long feb28_1900;
-    private static final long msPerDay = 24 * 3600 * 1000;
+    private static final long BASE_TIME;
+    private static final long FEB28_1900;
+    private static final long MS_PER_DAY = 24 * 3600 * 1000;
 
     static {
         GregorianCalendar c = new GregorianCalendar();
         c.setTimeZone(TimeZone.getTimeZone("GMT"));
         c.set(1899, 11, 30, 0, 0, 0);
-        baseTime = c.getTime().getTime();
+        BASE_TIME = c.getTime().getTime();
         c.set(1900, 1, 28, 0, 0, 0);
-        feb28_1900 = c.getTimeInMillis();
+        FEB28_1900 = c.getTimeInMillis();
     }
 
     private PrintWriter w = null;
@@ -56,6 +57,7 @@ public class MyWorksheet {
         w.println("<sheetData>");
     }
 
+    @Override
     public void close() {
         w.println("</sheetData>");
         w.println("</worksheet>");
@@ -77,11 +79,11 @@ public class MyWorksheet {
 
     public static long computeExcelDate(Date d) {
         long time = d.getTime();
-        if (time > feb28_1900) {
-            time = time + msPerDay;
+        if (time > FEB28_1900) {
+            time = time + MS_PER_DAY;
         }
-        long deltaMilliseconds = time - baseTime;
-        long numDays = deltaMilliseconds / msPerDay;
+        long deltaMilliseconds = time - BASE_TIME;
+        long numDays = deltaMilliseconds / MS_PER_DAY;
         return numDays;
     }
     
@@ -137,19 +139,19 @@ public class MyWorksheet {
 
 
     public static String toBase26(int x) {
-        return toBase26(x, "");
+        return toBase26(x, new StringBuilder()).toString();
     }
 
-    public static String toBase26(int x, String prefix) {
+    public static StringBuilder toBase26(int x, StringBuilder prefix) {
         if (x < 26) {
-            int charValue = (char) 'A';
+            int charValue = 'A';
             int newCharValue = charValue + x;
             char newChar = (char) newCharValue;
-            return prefix + newChar;
+            return prefix.append(newChar);
         } else {
             int y = x / 26 - 1;
             int z = x % 26;
-            return prefix + toBase26(z, toBase26(y, ""));
+            return prefix.append(toBase26(z, toBase26(y, new StringBuilder())));
         }
     }
 }
