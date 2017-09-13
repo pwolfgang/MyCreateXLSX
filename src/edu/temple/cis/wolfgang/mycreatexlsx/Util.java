@@ -107,7 +107,7 @@ public class Util {
         }
     }
 
-    public static void BuildSpreadsheetFromQuery(DataSource dataSource, String query, OutputStream out) {
+    public static void buildSpreadsheetFromQuery(DataSource dataSource, String query, OutputStream out) {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
