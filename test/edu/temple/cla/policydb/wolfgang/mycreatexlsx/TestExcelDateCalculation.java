@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.temple.cis.wolfgang.mycreatexlsx;
+package edu.temple.cla.policydb.wolfgang.mycreatexlsx;
 
+import edu.temple.cla.policydb.wolfgang.mycreatexlsx.MyWorksheet;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;

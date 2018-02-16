@@ -3,15 +3,16 @@
  * and open the template in the editor.
  */
 
-package edu.temple.cis.wolfgang.mycreatexlsx;
+package edu.temple.cla.policydb.wolfgang.mycreatexlsx;
 
+import edu.temple.cla.policydb.wolfgang.mycreatexlsx.MyWorksheet;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import static edu.temple.cis.wolfgang.mycreatexlsx.MyWorksheet.computeExcelDate;
+import static edu.temple.cla.policydb.wolfgang.mycreatexlsx.MyWorksheet.computeExcelDate;
 
 /**
  *

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package edu.temple.cis.wolfgang.mycreatexlsx;
+package edu.temple.cla.policydb.wolfgang.mycreatexlsx;
 
 import java.io.Closeable;
 import java.io.FileNotFoundException;

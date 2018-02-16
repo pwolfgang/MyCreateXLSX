@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package edu.temple.cis.wolfgang.mycreatexlsx;
+package edu.temple.cla.policydb.wolfgang.mycreatexlsx;
 
+import edu.temple.cla.policydb.wolfgang.mycreatexlsx.MyWorkbook;
 import java.io.InputStream;
 import org.junit.After;
 import org.junit.AfterClass;
