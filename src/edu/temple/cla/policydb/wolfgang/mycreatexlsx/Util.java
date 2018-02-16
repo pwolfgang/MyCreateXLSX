@@ -43,7 +43,7 @@ import org.apache.log4j.Logger;
 
 /**
  *
- * @author Paul
+ * @author Paul Wolfgang
  */
 public class Util {
 

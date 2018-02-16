@@ -47,7 +47,7 @@ POSSIBILITY OF SUCH DAMAGE.
             <vt:lpstr>Sheet1</vt:lpstr>
         </vt:vector>
     </TitlesOfParts>
-    <Company>Temple University CIS Department</Company>
+    <Company>Temple University PA Policy Database Project</Company>
     <LinksUpToDate>false</LinksUpToDate>
     <SharedDoc>false</SharedDoc>
     <HyperlinksChanged>false</HyperlinksChanged>
