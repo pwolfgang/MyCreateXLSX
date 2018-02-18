@@ -39,7 +39,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
 
@@ -145,7 +145,7 @@ public class MyWorksheet implements Closeable {
 
     public void addCell(String s) {
         w.println("<c r=\"" + toBase26(colNum++) + (rowNum) + "\" t=\"inlineStr\">");
-        w.println("<is><t>" + StringEscapeUtils.escapeXml(s) + "</t></is>");
+        w.println("<is><t>" + StringEscapeUtils.escapeXml11(s) + "</t></is>");
         endColumn();
     }
 
