@@ -42,8 +42,10 @@ import java.util.zip.ZipOutputStream;
 import org.apache.log4j.Logger;
 
 /**
- * This class represents an Excel 2007 workbook.  It is limited to a
- * single worksheet.
+ * This class creates an Excel 2007 workbook.
+ * It is limited to a single worksheet.
+ * An Excel 2007 workbook is a compressed folder of several xml files.  Most
+ * of which are common to all spreadsheets. 
  * @author Paul Wolfgang
  */
 public class MyWorkbook implements Closeable {
@@ -66,7 +68,7 @@ public class MyWorkbook implements Closeable {
     /**
      * Create a new MyWorkbook with the given file name
      * @param fileName The name of the file to contain the Excel workbook
-     * @throws java.io.FileNotFoundException
+     * @throws java.io.FileNotFoundException If unable to create the file.
      */
     public MyWorkbook(String fileName) throws FileNotFoundException {
             this(new FileOutputStream(fileName));
@@ -74,7 +76,9 @@ public class MyWorkbook implements Closeable {
     }
 
     /**
-     * Create a new MyWorkbook with the given OutputStream
+     * Create a new MyWorkbook with the given OutputStream.
+     * Initialize the zip output stream and add the common sub-folders and
+     * xml file contents.
      * @param os The OutputStream where the workbook is written.
      */
     public MyWorkbook(OutputStream os) {
@@ -94,6 +98,9 @@ public class MyWorkbook implements Closeable {
         }
     }
 
+    /**
+     * Close the workbook.
+     */
     @Override
     public void close() {
         try {
@@ -109,6 +116,11 @@ public class MyWorkbook implements Closeable {
         }
     }
 
+    /**
+     * Copy a part from the template to the zip output stream.
+     * @param partName The part to be added.
+     * @throws IOException 
+     */
     private void addPartFromTemplate(String partName) throws IOException {
         InputStream in = findPartInTemplate(partName);
         if (in != null) {
@@ -122,12 +134,24 @@ public class MyWorkbook implements Closeable {
         }
     }
 
+    /** 
+     * Search the resources for a file.
+     * @param partName The name of the file to be found.
+     * @return An input stream referencing the found file
+     * @throws IOException 
+     */
     InputStream findPartInTemplate(String partName) throws IOException {
-        Class myClass = getClass();
+        Class<?> myClass = getClass();
         String resourceName = "templates/" + partName;
         return myClass.getResourceAsStream(resourceName);
     }
 
+    /**
+     * Method to copy one iostream to another.
+     * @param in The source input stream
+     * @param out The destination output stream
+     * @throws IOException 
+     */
     private void copyStream(InputStream in, OutputStream out) throws IOException {
         int c;
         while ((c = in.read()) != -1) {
@@ -135,6 +159,10 @@ public class MyWorkbook implements Closeable {
         }
     }
 
+    /**
+     * Method to create the worksheet.
+     * @return The worksheet.
+     */
     public MyWorksheet getWorksheet() {
         try {
             zipEntry = new ZipEntry("xl/worksheets/sheet1.xml");

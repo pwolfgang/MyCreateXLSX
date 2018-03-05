@@ -44,7 +44,12 @@ import org.apache.log4j.Logger;
 
 
 /**
- *
+ * This class builds the worksheet xml file. 
+ * The resulting worksheet conforms to the excel standard, but is not typical
+ * of that produced by excel. Excel generates a more efficient file by creating
+ * a constant pool, and the cell contents are references to the constant pool.
+ * This class does not create the constant pool, and instead stores the 
+ * individual values in each cell.
  * @author Paul Wolfgang
  */
 public class MyWorksheet implements Closeable {
@@ -69,6 +74,10 @@ public class MyWorksheet implements Closeable {
     int rowNum = 0;
     int colNum = 0;
 
+    /**
+     * Create a worksheet xml file.
+     * @param os The output stream where the xml file is written.
+     */
     MyWorksheet(OutputStream os) {
         try {
             w = new PrintWriter(new OutputStreamWriter(os, "UTF-8"));
@@ -83,6 +92,9 @@ public class MyWorksheet implements Closeable {
         w.println("<sheetData>");
     }
 
+    /**
+     * Close the worksheet.
+     */
     @Override
     public void close() {
         w.println("</sheetData>");
@@ -90,6 +102,11 @@ public class MyWorksheet implements Closeable {
         w.flush();
     }
 
+    /**
+     * Compute an excel date value.
+     * @param dateString A date string in the form yyyy-mm-dd
+     * @return The excel date
+     */
     public static long computeExcelDate(String dateString) {
         String[] dateTokens = dateString.split("-|\\s+");
         int year = Integer.parseInt(dateTokens[0]);
@@ -103,8 +120,16 @@ public class MyWorksheet implements Closeable {
         return computeExcelDate(d);
     }
 
+    /**
+     * Compute an excel date value.
+     * Excel dates are the number of days since Dec. 30, 1899. (I.E. Jan. 1, 1900
+     * is day 1), assuming that 1900 was a leap year (which it was not).
+     * @param d A java Date value, the number of milliseconds since Jan 1, 1970).
+     * @return The excel date value.
+     */
     public static long computeExcelDate(Date d) {
         long time = d.getTime();
+        // Correct time value to assume that 1900 was a leap year
         if (time > FEB28_1900) {
             time = time + MS_PER_DAY;
         }
@@ -113,42 +138,70 @@ public class MyWorksheet implements Closeable {
         return numDays;
     }
     
+    /** 
+     * Start a new row in the spreadsheet
+     */
     public void startRow() {
         rowNum++;
         colNum = 0;
         w.printf("<row r=\"%d\">%n", rowNum);
     }
     
+    /**
+     * End the current row.
+     */
     public void endRow() {
         w.println("</row>");
     }
 
+    /**
+     * Start a column (new cell)
+     */
     private void startColumn() {
         w.println("<c r=\"" + toBase26(colNum++) + (rowNum) + "\">");
     }
 
+    /**
+     * End the current cell
+     */
     private void endColumn() {
         w.println("</c>");
     }
 
+    /**
+     * Add an int value to the spreadsheet.
+     * @param x The int value to be added
+     */
     public void addCell(int x) {
         startColumn();
         w.println("<v>" + x + "</v>");
         endColumn();
     }
 
+    /**
+     * Add a double value to the spreadsheet
+     * @param x The double value to be added.
+     */
     public void addCell(double x) {
         startColumn();
         w.println("<v>" + x + "</v>");
         endColumn();
     }
 
+    /**
+     * Add a String value to the spreadsheet
+     * @param s The string to be added
+     */
     public void addCell(String s) {
         w.println("<c r=\"" + toBase26(colNum++) + (rowNum) + "\" t=\"inlineStr\">");
         w.println("<is><t>" + StringEscapeUtils.escapeXml11(s) + "</t></is>");
         endColumn();
     }
 
+    /**
+     * Add a Date value to the spreadsheet
+     * @param d The Date value to be added
+     */
     public void addCell(Date d) {
         long numDays = computeExcelDate(d);
         w.println("<c r=\"" + toBase26(colNum++) + (rowNum) + "\" s=\"1\">");
@@ -156,6 +209,10 @@ public class MyWorksheet implements Closeable {
         endColumn();
     }
 
+    /**
+     * Add a date string value to the spreadsheet
+     * @param s The date in the form yyyy-mm-dd
+     */
     public void addDateCell(String s) {
         long numDays = computeExcelDate(s);
         w.println("<c r=\"" + toBase26(colNum++) + (rowNum) + "\" s=\"1\">");
@@ -164,11 +221,24 @@ public class MyWorksheet implements Closeable {
     }
 
 
+    /**
+     * Compute the excel column reference.
+     * A column reference is a base 26 number using the letters A-Z.
+     * @param x The column number
+     * @return The excel column reference
+     */
     public static String toBase26(int x) {
         return toBase26(x, new StringBuilder()).toString();
     }
 
-    public static StringBuilder toBase26(int x, StringBuilder prefix) {
+    /**
+     * Compute the least significant digit and append it to the partial result.
+     * Typically the recursion is only called once since column ZZ is 676.
+     * @param x The value to be converted
+     * @param prefix The current prefix
+     * @return The prefix with the next digit appended.
+     */
+    private static StringBuilder toBase26(int x, StringBuilder prefix) {
         if (x < 26) {
             int charValue = 'A';
             int newCharValue = charValue + x;
