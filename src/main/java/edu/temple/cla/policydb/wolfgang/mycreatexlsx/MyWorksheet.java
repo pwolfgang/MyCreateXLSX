@@ -36,9 +36,9 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
+import static java.time.ZoneOffset.UTC;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.log4j.Logger;
 
@@ -57,18 +57,9 @@ public class MyWorksheet implements Closeable {
     private static final Logger LOGGER = Logger.getLogger(MyWorkbook.class);
 
 
-    private static final long BASE_TIME;
-    private static final long FEB28_1900;
+    private static final long BASE_TIME = LocalDate.of(1899, 12, 31).toEpochDay();
+    private static final LocalDate FEB28_1900 = LocalDate.of(1900, 2, 28);
     private static final long MS_PER_DAY = 24 * 3600 * 1000;
-
-    static {
-        GregorianCalendar c = new GregorianCalendar();
-        c.setTimeZone(TimeZone.getTimeZone("GMT"));
-        c.set(1899, 11, 30, 0, 0, 0);
-        BASE_TIME = c.getTime().getTime();
-        c.set(1900, 1, 28, 0, 0, 0);
-        FEB28_1900 = c.getTimeInMillis();
-    }
 
     private PrintWriter w = null;
     int rowNum = 0;
@@ -112,11 +103,7 @@ public class MyWorksheet implements Closeable {
         int year = Integer.parseInt(dateTokens[0]);
         int month = Integer.parseInt(dateTokens[1]);
         int day = Integer.parseInt(dateTokens[2]);
-        GregorianCalendar c = new GregorianCalendar();
-        c.setTimeZone(TimeZone.getTimeZone("GMT"));
-        c.clear();
-        c.set(year, month-1, day);
-        Date d = c.getTime();
+        LocalDate d = LocalDate.of(year, month, day);
         return computeExcelDate(d);
     }
 
@@ -127,14 +114,11 @@ public class MyWorksheet implements Closeable {
      * @param d A java Date value, the number of milliseconds since Jan 1, 1970).
      * @return The excel date value.
      */
-    public static long computeExcelDate(Date d) {
-        long time = d.getTime();
-        // Correct time value to assume that 1900 was a leap year
-        if (time > FEB28_1900) {
-            time = time + MS_PER_DAY;
+    public static long computeExcelDate(LocalDate d) {
+        if (d.isAfter(FEB28_1900)) {
+            d = d.plusDays(1);
         }
-        long deltaMilliseconds = time - BASE_TIME;
-        long numDays = deltaMilliseconds / MS_PER_DAY;
+        long numDays = d.toEpochDay() - BASE_TIME;
         return numDays;
     }
     
@@ -203,7 +187,7 @@ public class MyWorksheet implements Closeable {
      * @param d The Date value to be added
      */
     public void addCell(Date d) {
-        long numDays = computeExcelDate(d);
+        long numDays = computeExcelDate(d.toInstant().atZone(UTC).toLocalDate());
         w.println("<c r=\"" + toBase26(colNum++) + (rowNum) + "\" s=\"1\">");
         w.println("<v>" + numDays + "</v>");
         endColumn();

@@ -52,13 +52,13 @@ import static org.junit.Assert.assertEquals;
 @RunWith(value = Parameterized.class)
 public class TestExcelDateCalculation {
 
-    private String dateString;
-    private long expected;
+    private final String dateString;
+    private final long expected;
 
 
     @Parameters
     public static Collection<Object[]> getParameters() {
-        List<Object[]> params = new ArrayList<Object[]>(
+        List<Object[]> params = new ArrayList<>(
                 Arrays.asList(new Object[][]{
                     {"1900-01-01", 1},
                     {"1900-01-02", 2},
